@@ -1,37 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using LocalDB.Web.Models;
+using LocalDB.Models;
+using LocalDB.Core.Repositories;
+using System.Collections.Generic;
+using LocalDB.Core.Domain;
 
-namespace LocalDB.Web.Controllers
+namespace LocalDB.Controllers
 {
     public class HomeController : Controller
     {
+        #region Fields
+        private readonly IItemRepository _itemRepository;
+        #endregion
+
+        #region Constructor
+        public HomeController(IItemRepository itemRepository)
+        {
+            _itemRepository = itemRepository;
+        }
+        #endregion
+
+        #region Methods
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
+            IEnumerable<Item> items = _itemRepository.GetAll();
+            return View(items);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -39,5 +32,6 @@ namespace LocalDB.Web.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        #endregion
     }
 }

@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalDB.Web", "LocalDB.Web\LocalDB.Web.csproj", "{0034AEE8-4A03-4D28-BEC8-995EC852774E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalDB.Core", "LocalDB.Core\LocalDB.Core.csproj", "{3A126760-140C-4675-8FC4-E658CD0722F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalDB.Data", "LocalDB.Data\LocalDB.Data.csproj", "{B6F91AB2-2D8F-46EA-B3B0-50A5A7310221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{0034AEE8-4A03-4D28-BEC8-995EC852774E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0034AEE8-4A03-4D28-BEC8-995EC852774E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0034AEE8-4A03-4D28-BEC8-995EC852774E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A126760-140C-4675-8FC4-E658CD0722F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A126760-140C-4675-8FC4-E658CD0722F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A126760-140C-4675-8FC4-E658CD0722F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A126760-140C-4675-8FC4-E658CD0722F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6F91AB2-2D8F-46EA-B3B0-50A5A7310221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6F91AB2-2D8F-46EA-B3B0-50A5A7310221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6F91AB2-2D8F-46EA-B3B0-50A5A7310221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6F91AB2-2D8F-46EA-B3B0-50A5A7310221}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
