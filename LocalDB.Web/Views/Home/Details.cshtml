@@ -1,0 +1,10 @@
+﻿@using LocalDB.Core.Domain
+@model Item
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+<h1>Item Name: @Model.Name</h1>
+<h1>Item Description: @Model.Description</h1>
+<h1>Amount of items in stock: @Model.Amount</h1>

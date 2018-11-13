@@ -27,6 +27,12 @@ namespace LocalDB.Controllers
             return View(items);
         }
 
+        public IActionResult Details(int id)
+        {
+            Item item = _itemRepository.GetBy(id);
+            return View(item);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
