@@ -19,9 +19,9 @@ namespace LocalDB.Data
         #endregion
 
         #region Methods
-        public void Add(Item itemId)
+        public void Add(Item item)
         {
-            _dbContext.Items.Add(itemId);
+            _dbContext.Items.Add(item);
         }
 
         public IEnumerable<Item> GetAll()
@@ -34,9 +34,9 @@ namespace LocalDB.Data
             return _dbContext.Items.Find(itemId);
         }
 
-        public void Remove(Item itemId)
+        public void Remove(Item item)
         {
-            _dbContext.Items.Remove(itemId);
+            _dbContext.Items.Remove(item);
         }
 
         public void SaveChanges()
