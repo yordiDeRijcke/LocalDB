@@ -1,29 +1,33 @@
 ﻿@using LocalDB.Core.Domain
 @model IEnumerable<Item>
 @{
-    ViewData["Title"] = "Index";
+ViewData["Title"] = "Items";
 }
-
-<h2>Index</h2>
-
-<table class="table">
-    <!-- Search & index placeholder-->
-    @foreach (Item item in Model)
-    {
-    <tr>
-        <!--<td><a asp-controller="Home" asp-action="Details" asp-route-id="@item.ItemId">@item.Name</a></td>-->
-        <td class="col-xs-2 col-md-3"><img class="img-responsive" src="~/images/testImage.png"/></td>
-        <td>
-            <table>
-                <tr>
-                    <th>@item.Name</th>
-                 </tr>
-                <tr>
-                    <td>@item.Description</td>
-                </tr>
-            </table>
-        </td>
-    <td>Amount: @item.Amount</td>
-    </tr>
-    }
-</table>
+<div class="table-responsive" style="border: 1px solid lightgrey; border-radius: 5px; border-collapse: collapse;">
+    <table class="table">
+        @foreach (Item item in Model)
+        {
+        <tr>
+            <td class="col-xs-6 col-md-3">
+                <a asp-action="Details" asp-route-id="@item.ItemId">
+                    <img class="img img-responsive" src="~/images/patrick.jpg" heigth="20%"/>
+                </a>
+            </td>
+            <td class="col-xs-6">
+                <a asp-action="Details" asp-route-id="@item.ItemId">
+                    <table>
+                        <tr>
+                            <th style="padding-bottom: 10%,">@item.Name</th>
+                        </tr>
+                        <tr>
+                            <td class="hidden-xs hidden-sm">@item.Description</td>
+                            <td class="visible-xs visible-sm">Amount: @item.Amount</td>
+                        </tr>
+                    </table>
+                </a>
+            </td>
+            <td class="hidden-xs hidden-sm col-md-3">Amount: @item.Amount</td>
+        </tr>
+        } 
+    </table>
+</div>
