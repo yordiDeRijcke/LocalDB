@@ -7,14 +7,14 @@ using LocalDB.Core.Domain;
 
 namespace LocalDB.Controllers
 {
-    public class HomeController : Controller
+    public class ItemController : Controller
     {
         #region Fields
         private readonly IItemRepository _itemRepository;
         #endregion
 
         #region Constructor
-        public HomeController(IItemRepository itemRepository)
+        public ItemController(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }

@@ -1,0 +1,29 @@
+﻿@using LocalDB.Core.Domain
+@model IEnumerable<Item>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <!-- Search & index placeholder-->
+    @foreach (Item item in Model)
+    {
+    <tr>
+        <!--<td><a asp-controller="Home" asp-action="Details" asp-route-id="@item.ItemId">@item.Name</a></td>-->
+        <td class="col-xs-2 col-md-3"><img class="img-responsive" src="~/images/testImage.png"/></td>
+        <td>
+            <table>
+                <tr>
+                    <th>@item.Name</th>
+                 </tr>
+                <tr>
+                    <td>@item.Description</td>
+                </tr>
+            </table>
+        </td>
+    <td>Amount: @item.Amount</td>
+    </tr>
+    }
+</table>
