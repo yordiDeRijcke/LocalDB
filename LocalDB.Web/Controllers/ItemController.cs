@@ -4,6 +4,7 @@ using LocalDB.Models;
 using LocalDB.Core.Repositories;
 using System.Collections.Generic;
 using LocalDB.Core.Domain;
+using System.Linq;
 
 namespace LocalDB.Controllers
 {
@@ -25,6 +26,14 @@ namespace LocalDB.Controllers
         {
             IEnumerable<Item> items = _itemRepository.GetAll();
             return View(items);
+        }
+
+        public IActionResult ChangeStock(int id, int stock)
+        {
+            Item item = _itemRepository.GetBy(id);
+            item.Stock = stock;
+            _itemRepository.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Details(int id)

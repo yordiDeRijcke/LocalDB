@@ -16,7 +16,7 @@ namespace LocalDB.Data.Mappers
             builder.HasKey(b => b.ItemId);
             builder.Property(b => b.Name).IsRequired().HasMaxLength(50);
             builder.Property(b => b.Description).HasMaxLength(150);
-            builder.Property(b => b.Amount).IsRequired();
+            builder.Property(b => b.Stock).IsRequired();
             #endregion
         }
     }

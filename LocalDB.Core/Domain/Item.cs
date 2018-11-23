@@ -2,20 +2,33 @@
 {
     public class Item
     {
+        #region Fields
+        private int _stock;
+        #endregion
 
         #region Properties
-        public int ItemId { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public int Amount { get; private set; }
+        public int ItemId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int Stock {
+            get {
+                return _stock;
+            }
+            set {
+                if (value >= 0)
+                {
+                    _stock = value;
+                }
+            }
+        }
         #endregion
 
         #region Constructor
-        public Item(string name, string description, int amount)
+        public Item(string name, string description, int stock)
         {
             Name = name;
             Description = description;
-            Amount = amount;
+            Stock = stock;
         }
         #endregion
     }

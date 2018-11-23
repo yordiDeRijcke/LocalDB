@@ -22,12 +22,14 @@ namespace LocalDB.Data
 
             if (_dbContext.Database.EnsureCreated())
             {
-                Item ItemX = new Item("ItemX", "Dit is ItemX!", 0);
+                Item ItemX = new Item("124cc Takegawa DOHC 4klepper", "Deze 124cc Takegawa DOHC 4klepper kit geeft u 17pk. Dit zorgt voor een goede trekkracht in zijn 5 versnellingen!", 2);
                 _dbContext.Items.Add(ItemX);
-                Item ItemY = new Item("ItemY", "Dit is ItemY!", 1);
+                Item ItemY = new Item("Aline", "De dees moogt ge al stekken voor €5! 1 + 1 gratis!!!", 69);
                 _dbContext.Items.Add(ItemY);
-                Item ItemZ = new Item("ItemZ", "Dit is ItemZ!", 2);
+                Item ItemZ = new Item("Dell XPS15", "Deze laptop is voorzien van een i7 quad-core hyperthreaded CPU in combinatie met 16GB DDR4 RAM en een GTX 1050M!", 2);
                 _dbContext.Items.Add(ItemZ);
+                Item ItemD = new Item("XL Pak Pall Mall", "30 safkes in een pakske hoogkwalitatieve Pall Mall! Proef dat nu!", 0);
+                _dbContext.Items.Add(ItemD);
                 _dbContext.SaveChanges();
             }
         }
