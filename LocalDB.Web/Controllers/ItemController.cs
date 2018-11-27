@@ -5,11 +5,18 @@ using LocalDB.Core.Repositories;
 using System.Collections.Generic;
 using LocalDB.Core.Domain;
 using System.Linq;
+using LocalDB.Web.ViewModels;
 
 namespace LocalDB.Controllers
 {
     public class ItemController : Controller
     {
+        public class changedItem
+        {
+            public int itemId { get; set; }
+            public int stock { get; set; }
+        }
+
         #region Fields
         private readonly IItemRepository _itemRepository;
         #endregion
@@ -28,12 +35,19 @@ namespace LocalDB.Controllers
             return View(items);
         }
 
-        public IActionResult ChangeStock(int id, int stock)
+        [HttpPost]
+        public IActionResult UpdateStock(IEnumerable<changedItem> changedItems)
         {
-            Item item = _itemRepository.GetBy(id);
-            item.Stock = stock;
+            Item itemToChange;
+
+            foreach (changedItem changedItem in changedItems)
+            {
+                itemToChange = _itemRepository.GetBy(changedItem.itemId);
+                itemToChange.Stock = changedItem.stock;
+            }
+
             _itemRepository.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
 
         public IActionResult Details(int id)
