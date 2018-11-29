@@ -4,7 +4,6 @@ using LocalDB.Models;
 using LocalDB.Core.Repositories;
 using System.Collections.Generic;
 using LocalDB.Core.Domain;
-using System.Linq;
 
 namespace LocalDB.Controllers
 {
