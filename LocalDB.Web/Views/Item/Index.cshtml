@@ -7,7 +7,8 @@
 <!-- Page Content -->
 <div class="container">
     <div class="row" id="menu-div">
-        <!-- Menu buttons go here -->
+        <button class= "btn btn-default hideButtons" id="saveChangesBtn">Save Changes</button>
+        <button class="btn btn-default hideButtons" id="viewChangesBtn">View Changes</button>
     </div>
     <div class="row">
 
@@ -55,18 +56,12 @@
     </div>
 </div>
 
-<script>
-    let originalItems = new Map();
+@section Scripts {
+    <script>
+        let allItems = @(Json.Serialize(Model));
+    </script>
 
-    // Fill originalItems
-    @(Html.Raw(Json.Serialize(Model))).forEach(function (item) {
-        originalItems.set(item.itemId, { name: item.name, stock: item.stock });
-    });
-</script>
-
-<script src="~/js/site.js" type="text/javascript"></script>
-
-<script>
+    <script>
     function saveChanges(e) {
         // Convert changedItems Map to [Object]
         let changedItemsArray= [];
@@ -81,4 +76,5 @@
             });
         window.location.reload();
     }
-</script>
+    </script>
+}

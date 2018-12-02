@@ -1,60 +1,51 @@
 ﻿"use strict";
 
-let changedItems = new Map();
-let changesButtonsMade = false;
+let changeBtn, saveBtn;
+let changesButtonsVisible = false;
+let changedItems = new Array[];
 
 function stockChanged(id, changeType) {
     const inputField = document.getElementById(`${id}-stock`);
-    const oldStock = changedItems.has(id) ? changedItems.get(id) : parseInt(originalItems.get(id).stock); // Saves the previous value (before change), checks where the last known value is located.
-    let newStock;
+    
+    const itemObj = allItems.get(id);
+    const oldStock = itemObj.hasOwnProperty("changedStock") ? itemObj.changedStock : parseInt(itemObj.stock); // Saves the previous value
 
     switch (changeType) {   // Check input
         case "--":
-            newStock = checkValidNumber(oldStock - 1); // null if < 0
+            itemObj.changedStock = checkValidNumber(oldStock - 1); // null if < 0
             break;
 
         case "++":
-            newStock = (oldStock + 1);
+            itemObj.changedStock = (oldStock + 1);
             break;
 
         case "manual":
-            newStock = checkValidNumber(parseInt(inputField.value)); // null if < 0
+            itemObj.changedStock = checkValidNumber(parseInt(inputField.value)); // null if < 0
             break;
     }
 
-    if (newStock != null) { // Save input when correct + display buttons
-        if (newStock != parseInt(originalItems.get(id).stock)) {
-            changedItems.set(id, newStock);
-
-            if (changesButtonsMade == false) {
-                changesButtonsMade = true;
-
-                // saveChanges button
-                let buttonElem = document.createElement("button");
-                buttonElem.setAttribute("class", "btn btn-default");
-                buttonElem.innerHTML = "Save Changes";
-
-                buttonElem.addEventListener("click", saveChanges);
-
-                document.getElementById("menu-div").appendChild(buttonElem);
-
-                buttonElem = document.createElement("button");
-                buttonElem.setAttribute("class", "btn btn-default");
-                buttonElem.setAttribute("id", "viewChangesBtn");
-                buttonElem.innerHTML = "View Changes";
-
-                document.getElementById("menu-div").appendChild(buttonElem);
+    if (itemObj.changedStock != null) { // checks if input is correct + display buttons when invisible
+        if (itemObj.changedStock != parseInt(itemObj.stock)) { // checks if it is a change compared to the original value
+            allItems.set(id, itemObj);
+            if (changesButtonsVisible == false) {
+                changesButtonsVisible = true;
+                setChangesButtonsVisible();
+                changeBtn.addEventListener("click", viewChangesBtnPressed);
             }
         } else {
-            changedItems.delete(id); // When you change an item to the original value it isn't changed, therefore it should be deleted from the changedItems.
+            allItems.set(itemObj.id, {
+                name: itemObj.name,
+                description: itemObj.description,
+
+            });
+            console.log([...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).length);
+            if ([...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).length === 0) {
+                setChangesButtonsInvisible();
+                changesButtonsVisible = false;
+            }
         }
 
-        inputField.value = newStock; // inputField value must be changed regardless of whether it's actually a change or not (compared to original).
-
-        // Overwrite onClick eventHandler with updated items.
-        let viewChangesBtn = document.getElementById("viewChangesBtn");
-        viewChangesBtn.removeEventListener("click", viewChangesBtnPressed);
-        viewChangesBtn.addEventListener("click", viewChangesBtnPressed);
+        inputField.value = itemObj.changedStock; // inputField value must be changed regardless of whether it's actually a change or not (compared to original).
     } else {
         inputField.value = previousStock;
     }
@@ -75,22 +66,34 @@ function checkValidNumber(value) {
 }
 
 function viewChangesBtnPressed(e) {
-    let changedItemsLog = "Name:                     Original Value:  ->  New Value:\n"; // /t doesn't work in chrome :(
-    let originalElem;
-
-    changedItems.forEach((value, key) => {
-        originalElem = originalItems.get(key);
-        changedItemsLog += `${originalElem.name.length > 16 ? originalElem.name.substring(0, 16) + "..." : originalElem.name}                     ${originalElem.stock}  ->  ${value}\n`;
+    let changedItemsLog = "Name:\tOriginal Value:\t->\tNew Value:\n"; // /t doesn't work in chrome :(
+    console.log(allItems.values());
+    [...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).forEach(changedItem => {
+        changedItemsLog += `${changedItem.name.length > 16 ? changedItem.name.substring(0, 16) + "..." : changedItem.name}\t${changedItem.stock}\t->\t${changedItem.changedStock}\n`;
     });
 
-    alert(changedItemsLog);
+    
+    BootstrapDialog.alert(changedItemsLog);
+}
+
+function setChangesButtonsVisible() {
+    saveBtn.setAttribute("class", "btn btn-default");
+    changeBtn.setAttribute("class", "btn btn-default");
+}
+
+function setChangesButtonsInvisible() {
+    //saveBtn.style.visibility = "hidden";
+    saveBtn.setAttribute("class", "btn btn-default hideButtons");
+    changeBtn.setAttribute("class", "btn btn-default hideButtons");
 }
 
 // init
-
 document.addEventListener("DOMContentLoaded", init);
 
 function init(e) {
+    saveBtn = document.getElementById("saveChangesBtn");
+    changeBtn = document.getElementById("viewChangesBtn");
+
     document.querySelectorAll(".btn-min").forEach((button) => {
         button.addEventListener("click", e => {
             stockChanged(parseInt(button.id.split("-")[0]), "--"); // return the id - -min
