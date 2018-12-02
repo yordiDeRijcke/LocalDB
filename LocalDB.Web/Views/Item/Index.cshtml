@@ -78,6 +78,7 @@
         $.post('@Url.Action("UpdateStock")', { changedItems: changedItemsArray },
         function () {
             $('#result').html('"UpdateStock()" successfully called.');
-        });
+            });
+        window.location.reload();
     }
 </script>
