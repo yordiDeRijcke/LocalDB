@@ -7,8 +7,8 @@
 <!-- Page Content -->
 <div class="container">
     <div class="row" id="menu-div">
-        <button class= "btn btn-default hideButtons" id="saveChangesBtn">Save Changes</button>
-        <button class="btn btn-default hideButtons" id="viewChangesBtn">View Changes</button>
+        <button class= "btn btn-default" id="saveChangesBtn">Save Changes</button>
+        <button class="btn btn-default" id="viewChangesBtn">View Changes</button>
     </div>
     <div class="row">
 
@@ -59,22 +59,5 @@
 @section Scripts {
     <script>
         let allItems = @(Json.Serialize(Model));
-    </script>
-
-    <script>
-    function saveChanges(e) {
-        // Convert changedItems Map to [Object]
-        let changedItemsArray= [];
-
-        changedItems.forEach((value, key) => {
-            changedItemsArray.push({itemId: key, stock: value});
-        });
-
-        $.post('@Url.Action("UpdateStock")', { changedItems: changedItemsArray },
-        function () {
-            $('#result').html('"UpdateStock()" successfully called.');
-            });
-        window.location.reload();
-    }
     </script>
 }

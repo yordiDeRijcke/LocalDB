@@ -2,13 +2,18 @@
 
 let changeBtn, saveBtn;
 let changesButtonsVisible = false;
-let changedItems = new Array[];
 
 function stockChanged(id, changeType) {
     const inputField = document.getElementById(`${id}-stock`);
+    let index;
+    let itemObj;
+
+    for (index in allItems) { //item = the indexes from an array
+        if (allItems[index].itemId == id)
+            itemObj = allItems[index];
+    }
     
-    const itemObj = allItems.get(id);
-    const oldStock = itemObj.hasOwnProperty("changedStock") ? itemObj.changedStock : parseInt(itemObj.stock); // Saves the previous value
+    const oldStock = itemObj.hasOwnProperty("changedStock") ? itemObj.changedStock : itemObj.stock; // Saves the previous value
 
     switch (changeType) {   // Check input
         case "--":
@@ -16,7 +21,7 @@ function stockChanged(id, changeType) {
             break;
 
         case "++":
-            itemObj.changedStock = (oldStock + 1);
+            itemObj.changedStock = checkValidNumber(oldStock + 1);
             break;
 
         case "manual":
@@ -25,29 +30,32 @@ function stockChanged(id, changeType) {
     }
 
     if (itemObj.changedStock != null) { // checks if input is correct + display buttons when invisible
-        if (itemObj.changedStock != parseInt(itemObj.stock)) { // checks if it is a change compared to the original value
-            allItems.set(id, itemObj);
-            if (changesButtonsVisible == false) {
-                changesButtonsVisible = true;
-                setChangesButtonsVisible();
-                changeBtn.addEventListener("click", viewChangesBtnPressed);
+        if (itemObj.changedStock != itemObj.stock) { // checks if it is a change compared to the original value
+            for (index in allItems) {
+                if (allItems[index].itemId == id) {
+                    allItems[index].changedStock = itemObj.changedStock;
+
+                    if (changesButtonsVisible == false) {
+                        changesButtonsVisible = true;
+                        setChangesButtonsVisible();
+                   }
+                }
             }
         } else {
-            allItems.set(itemObj.id, {
-                name: itemObj.name,
-                description: itemObj.description,
-
-            });
-            console.log([...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).length);
-            if ([...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).length === 0) {
-                setChangesButtonsInvisible();
-                changesButtonsVisible = false;
+            for (index in allItems) {
+                if (allItems[index].itemId == id) {
+                    debugger;
+                    delete allItems[index].changedStock;
+                }
             }
+                if (allItems.filter(item => item.hasOwnProperty("changedStock")).length === 0) {
+                    setChangesButtonsInvisible();
+                    changesButtonsVisible = false;
+                }
         }
-
-        inputField.value = itemObj.changedStock; // inputField value must be changed regardless of whether it's actually a change or not (compared to original).
+        inputField.value = isNaN(itemObj.changedStock) ? itemObj.stock : itemObj.changedStock; // inputField value must be changed regardless of whether it's actually a change or not (compared to original).
     } else {
-        inputField.value = previousStock;
+        inputField.value = oldStock;
     }
 }
 
@@ -64,7 +72,7 @@ function checkValidNumber(value) {
 
     return value;
 }
-
+//---------------------------------to do -----------------------------------------------------------
 function viewChangesBtnPressed(e) {
     let changedItemsLog = "Name:\tOriginal Value:\t->\tNew Value:\n"; // /t doesn't work in chrome :(
     console.log(allItems.values());
@@ -76,15 +84,26 @@ function viewChangesBtnPressed(e) {
     BootstrapDialog.alert(changedItemsLog);
 }
 
+function saveChangesBtnPressed(e) {
+    let changedItems = allItems.filter(item => {
+        item.hasOwnProperty("changedStock");
+    });
+
+    $.post('@Url.Action("UpdateStock")', { changedItems: changedItems },
+        () => {
+            $('#result').html('"UpdateStock()" successfully called.');
+        });
+    window.location.reload();
+}
+
 function setChangesButtonsVisible() {
-    saveBtn.setAttribute("class", "btn btn-default");
-    changeBtn.setAttribute("class", "btn btn-default");
+    saveBtn.style.visibility = "visible";
+    changeBtn.style.visibility = "visible";
 }
 
 function setChangesButtonsInvisible() {
-    //saveBtn.style.visibility = "hidden";
-    saveBtn.setAttribute("class", "btn btn-default hideButtons");
-    changeBtn.setAttribute("class", "btn btn-default hideButtons");
+    saveBtn.style.visibility = "hidden";
+    changeBtn.style.visibility = "hidden";
 }
 
 // init
@@ -93,6 +112,9 @@ document.addEventListener("DOMContentLoaded", init);
 function init(e) {
     saveBtn = document.getElementById("saveChangesBtn");
     changeBtn = document.getElementById("viewChangesBtn");
+    setChangesButtonsInvisible();
+    changeBtn.addEventListener("click", viewChangesBtnPressed);
+    saveBtn.addEventListener("click", saveChangesBtnPressed);
 
     document.querySelectorAll(".btn-min").forEach((button) => {
         button.addEventListener("click", e => {
