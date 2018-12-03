@@ -9,10 +9,10 @@ namespace LocalDB.Controllers
 {
     public class ItemController : Controller
     {
-        public class changedItem
+        public class ChangedItem
         {
             public int itemId { get; set; }
-            public int stock { get; set; }
+            public int changedStock { get; set; }
         }
 
         #region Fields
@@ -34,18 +34,24 @@ namespace LocalDB.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateStock(IEnumerable<changedItem> changedItems)
+        public IActionResult UpdateStock(List<ChangedItem> changedItems)
         {
             Item itemToChange;
 
-            foreach (changedItem changedItem in changedItems)
+            try
             {
-                itemToChange = _itemRepository.GetBy(changedItem.itemId);
-                itemToChange.Stock = changedItem.stock;
-            }
+                foreach (ChangedItem changedItem in changedItems)
+                {
+                    itemToChange = _itemRepository.GetBy(changedItem.itemId);
+                    itemToChange.Stock = changedItem.changedStock;
+                }
 
-            _itemRepository.SaveChanges();
-            return RedirectToAction("Index");
+                _itemRepository.SaveChanges();
+                return Json("Success");
+            } catch
+            {
+                return Json("Error");
+            }
         }
 
         public IActionResult Details(int id)

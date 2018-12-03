@@ -1,61 +1,52 @@
 ﻿"use strict";
 
 let changeBtn, saveBtn;
-let changesButtonsVisible = false;
+let changesButtonsVisible;
 
 function stockChanged(id, changeType) {
     const inputField = document.getElementById(`${id}-stock`);
-    let index;
-    let itemObj;
+    let itemIndex;
 
-    for (index in allItems) { //item = the indexes from an array
-        if (allItems[index].itemId == id)
-            itemObj = allItems[index];
+    for (itemIndex in allItems) {
+        if (allItems[itemIndex].itemId == id) {
+            break; // if the requested item is found: break the loop so the itemIndex is at the right value.
+        }
     }
-    
-    const oldStock = itemObj.hasOwnProperty("changedStock") ? itemObj.changedStock : itemObj.stock; // Saves the previous value
+
+    const oldStock = allItems[itemIndex].hasOwnProperty("changedStock") ? allItems[itemIndex].changedStock : allItems[itemIndex].stock; // Saves the previous value
 
     switch (changeType) {   // Check input
         case "--":
-            itemObj.changedStock = checkValidNumber(oldStock - 1); // null if < 0
+            allItems[itemIndex].changedStock = checkValidNumber(oldStock - 1); // null if < 0
             break;
 
         case "++":
-            itemObj.changedStock = checkValidNumber(oldStock + 1);
+            allItems[itemIndex].changedStock = checkValidNumber(oldStock + 1);
             break;
 
         case "manual":
-            itemObj.changedStock = checkValidNumber(parseInt(inputField.value)); // null if < 0
+            allItems[itemIndex].changedStock = checkValidNumber(parseInt(inputField.value)); // null if < 0
             break;
     }
 
-    if (itemObj.changedStock != null) { // checks if input is correct + display buttons when invisible
-        if (itemObj.changedStock != itemObj.stock) { // checks if it is a change compared to the original value
-            for (index in allItems) {
-                if (allItems[index].itemId == id) {
-                    allItems[index].changedStock = itemObj.changedStock;
+    if (allItems[itemIndex].changedStock != null) { // checks if input is correct (> 0)
+        if (allItems[itemIndex].changedStock != allItems[itemIndex].stock) { // checks if it is a change compared to the original value
+            if (changesButtonsVisible == false) {
+                changesButtonsVisible = true;
+                setChangesButtonsVisible();
+            }
 
-                    if (changesButtonsVisible == false) {
-                        changesButtonsVisible = true;
-                        setChangesButtonsVisible();
-                   }
-                }
-            }
-        } else {
-            for (index in allItems) {
-                if (allItems[index].itemId == id) {
-                    debugger;
-                    delete allItems[index].changedStock;
-                }
-            }
-                if (allItems.filter(item => item.hasOwnProperty("changedStock")).length === 0) {
-                    setChangesButtonsInvisible();
-                    changesButtonsVisible = false;
-                }
+            inputField.value = allItems[itemIndex].changedStock;
+        } else { // "change" is the same as the original value so it isn't a change.
+            inputField.value = allItems[itemIndex].stock;
+            delete allItems[itemIndex].changedStock;
+            hideChangeButtonsWhenNeeded();
         }
-        inputField.value = isNaN(itemObj.changedStock) ? itemObj.stock : itemObj.changedStock; // inputField value must be changed regardless of whether it's actually a change or not (compared to original).
-    } else {
+
+    } else { // Incorrect input
         inputField.value = oldStock;
+        delete allItems[itemIndex].changedStock;
+        hideChangeButtonsWhenNeeded();
     }
 }
 
@@ -72,38 +63,87 @@ function checkValidNumber(value) {
 
     return value;
 }
+
+function hideChangeButtonsWhenNeeded() { // Checks if there are still changes, if there are none: hide changeButtons
+    let hasChanges = false;
+
+    for (let item of allItems) {
+        if (item.hasOwnProperty("changedStock")) {
+            hasChanges = true;
+            break; // If one item is changed, the other results don't matter anymore
+        }
+    }
+
+    if (!hasChanges) { // When there are no changes the changesButtons should be hidden
+        setChangesButtonsInvisible();
+        changesButtonsVisible = false;
+    }
+}
 //---------------------------------to do -----------------------------------------------------------
 function viewChangesBtnPressed(e) {
     let changedItemsLog = "Name:\tOriginal Value:\t->\tNew Value:\n"; // /t doesn't work in chrome :(
-    console.log(allItems.values());
-    [...allItems.values()].filter(item => item.hasOwnProperty("changedStock")).forEach(changedItem => {
-        changedItemsLog += `${changedItem.name.length > 16 ? changedItem.name.substring(0, 16) + "..." : changedItem.name}\t${changedItem.stock}\t->\t${changedItem.changedStock}\n`;
+    allItems.forEach(item => {
+        if (item.hasOwnProperty("changedStock")) {
+            changedItemsLog += `${item.name.length > 16 ? item.name.substring(0, 16) + "..." : item.name}\t${item.stock}\t->\t${item.changedStock}\n`;
+        }
     });
 
-    
     BootstrapDialog.alert(changedItemsLog);
 }
 
 function saveChangesBtnPressed(e) {
-    let changedItems = allItems.filter(item => {
-        item.hasOwnProperty("changedStock");
+    let jsChangedItems = new Array;
+    allItems.forEach( item => {
+        if(item.hasOwnProperty("changedStock")) { // If it is a changed item
+            jsChangedItems.push({
+                itemId: item.itemId, // Only fill the list with the required properties
+                changedStock: item.changedStock
+            });
+        }
     });
 
-    $.post('@Url.Action("UpdateStock")', { changedItems: changedItems },
-        () => {
-            $('#result').html('"UpdateStock()" successfully called.');
+    $.post('/Item/UpdateStock', { changedItems: jsChangedItems }, function (data) {
+        const alertDiv = document.createElement("div");
+        alertDiv.setAttribute("role", "alert");
+
+        switch (data) {
+            case "Success":
+                alertDiv.setAttribute("class", "alert alert-success");
+                alertDiv.innerHTML = "Changes successfully pushed!";
+                break;
+
+            case "Error":
+                alertDiv.setAttribute("class", "alert alert-danger");
+                alertDiv.innerHTML = "Error while pushing changes!";
+                break;
+
+            default:
+                alertDiv.setAttribute("class", "alert alert-danger");
+                alertDiv.innerHTML = "Something went wrong!";
+        }
+        
+        document.body.insertBefore(alertDiv, document.body.firstChild) // Show the dialog above the changesButtons
+        setChangesButtonsInvisible(); // When changes are pushed, the buttons should dissappear
+        allItems.forEach(item => { // Changes should be set as original values now
+            if (item.hasOwnProperty("changedStock")) {
+                item.stock = item.changedStock;
+                delete item.changedStock;
+            }
         });
-    window.location.reload();
+
+    });
 }
 
 function setChangesButtonsVisible() {
     saveBtn.style.visibility = "visible";
     changeBtn.style.visibility = "visible";
+    changesButtonsVisible = true;
 }
 
 function setChangesButtonsInvisible() {
     saveBtn.style.visibility = "hidden";
     changeBtn.style.visibility = "hidden";
+    changesButtonsVisible = false;
 }
 
 // init
