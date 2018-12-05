@@ -79,16 +79,53 @@ function hideChangeButtonsWhenNeeded() { // Checks if there are still changes, i
         changesButtonsVisible = false;
     }
 }
-//---------------------------------to do -----------------------------------------------------------
 function viewChangesBtnPressed(e) {
-    let changedItemsLog = "Name:\tOriginal Value:\t->\tNew Value:\n"; // /t doesn't work in chrome :(
+    let changedItemsLog = "";
     allItems.forEach(item => {
         if (item.hasOwnProperty("changedStock")) {
-            changedItemsLog += `${item.name.length > 16 ? item.name.substring(0, 16) + "..." : item.name}\t${item.stock}\t->\t${item.changedStock}\n`;
+            changedItemsLog += `<strong>${item.name}:</strong>\n${item.stock} ${String.fromCharCode(8594)} ${item.changedStock}\n`;
         }
     });
 
-    BootstrapDialog.alert(changedItemsLog);
+    let bootDialog = new BootstrapDialog.show({
+        type: BootstrapDialog.TYPE_WARNING,
+        title: "Local Changes",
+        message: changedItemsLog,
+        buttons: [{
+            label: "Discard Changes",
+            action: () =>
+            {
+                discardChangesBtnPressed();
+                bootDialog.close();
+            }
+        },
+            {
+                label: "Save Changes",
+                action: () => {
+                    saveChangesBtnPressed();
+                    bootDialog.close();
+                },
+            }
+        ]
+    });
+}
+function discardChangesBtnPressed() {
+    let teller = 1;
+    allItems.forEach(item => {
+            if (item.hasOwnProperty("changedStock"))
+            document.getElementById(`${teller}-stock`).value = item.stock;
+        teller++;
+        delete item.changedStock;
+    });
+    setChangesButtonsInvisible();
+    const warningDiv = document.createElement("div");
+    warningDiv.setAttribute("id", "warningDiv");
+    warningDiv.setAttribute("class", "alert alert-warning");
+    warningDiv.innerHTML = "Changes have been discarded!";
+    document.body.insertBefore(warningDiv, document.body.firstChild)
+    setTimeout(() => { //makes the alert go away after 5s.
+        $("#warningDiv").remove();
+    }, 5000);
 }
 
 function saveChangesBtnPressed(e) {
@@ -105,6 +142,7 @@ function saveChangesBtnPressed(e) {
     $.post('/Item/UpdateStock', { changedItems: jsChangedItems }, function (data) {
         const alertDiv = document.createElement("div");
         alertDiv.setAttribute("role", "alert");
+        alertDiv.setAttribute("id", "alertDiv");
 
         switch (data) {
             case "Success":
@@ -124,6 +162,11 @@ function saveChangesBtnPressed(e) {
         
         document.body.insertBefore(alertDiv, document.body.firstChild) // Show the dialog above the changesButtons
         setChangesButtonsInvisible(); // When changes are pushed, the buttons should dissappear
+
+        setTimeout(() => { //makes the alert go away after 5s.
+            $("#alertDiv").remove();
+        }, 5000);
+
         allItems.forEach(item => { // Changes should be set as original values now
             if (item.hasOwnProperty("changedStock")) {
                 item.stock = item.changedStock;
