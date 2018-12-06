@@ -110,13 +110,15 @@ function viewChangesBtnPressed(e) {
     });
 }
 function discardChangesBtnPressed() {
-    let teller = 1;
-    allItems.forEach(item => {
-            if (item.hasOwnProperty("changedStock"))
-            document.getElementById(`${teller}-stock`).value = item.stock;
-        teller++;
+    const changedItems = allItems.filter(item => {
+        item.hasOwnProperty("changedStock");
+    });
+
+    changedItems.forEach(item => {
+        document.getElementById(`${item.itemId}-stock`).value = item.stock;
         delete item.changedStock;
     });
+
     setChangesButtonsInvisible();
     const warningDiv = document.createElement("div");
     warningDiv.setAttribute("id", "warningDiv");
